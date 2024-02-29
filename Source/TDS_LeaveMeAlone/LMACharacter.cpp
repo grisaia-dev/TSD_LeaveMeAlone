@@ -37,27 +37,37 @@ ALMACharacter::ALMACharacter() {
 // Called when the game starts or when spawned
 void ALMACharacter::BeginPlay() {
 	Super::BeginPlay();
-	GetCharacterMovement()->MaxWalkSpeed = NormalMaxWalkSpeed;
+	PlayerMovement = GetCharacterMovement();
+	checkf(PlayerMovement, TEXT("Unable CharacterMovement"));
 
 	PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	checkf(PC, TEXT("Unable to get reference to PlayerController"));
 
+	PlayerMovement->MaxWalkSpeed = NormalMaxWalkSpeed;
+
 	checkf(HealthComponent, TEXT("Create HealthComponent finished bad"));
+	HealthComponent->OnDeath.AddUObject(this, &ALMACharacter::OnDeath);
+	HealthComponent->OnHealthChanged.AddUObject(this, &ALMACharacter::OnHealthChanged);
+
+	checkf(DeathMontage, TEXT("Check DeathMontage!"));
 }
 
 
 // Called every frame
 void ALMACharacter::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
-	RotationOnCursor();
-	UpdateStamina();
+	if (!HealthComponent->IsDead()) {
+		RotationOnCursor();
+		UpdateStamina();
+	}
 
 	// temporary displey debug info
-	
+	GEngine->AddOnScreenDebugMessage(2, 0.5f, FColor::Green, *(FString::Printf(TEXT("Health - Current: %f"), HealthComponent->GetHealth())));
+	GEngine->AddOnScreenDebugMessage(1, 0.5f, FColor::Silver, *(FString::Printf(TEXT("Stamina - Current: %f"), CurrentStamina)));
 }
 
 // Called to bind functionality to input
-void ALMACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) { Super::SetupPlayerInputComponent(PlayerInputComponent); }
+//void ALMACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) { Super::SetupPlayerInputComponent(PlayerInputComponent); }
 
 void ALMACharacter::RotationOnCursor() {
 	if (PC) {
@@ -70,8 +80,8 @@ void ALMACharacter::RotationOnCursor() {
 
 void ALMACharacter::StartSprint() {
 	if (bHasStamina) {
-		GetCharacterMovement()->MaxWalkSpeed = SprintMaxWalkSpeed;
-		if (GetVelocity().Size() >= 0.5f) {
+		PlayerMovement->MaxWalkSpeed = SprintMaxWalkSpeed;
+		if (GetVelocity().Size() >= 0.4f) {
 			bIsSprint = true;
 		} else {
 			bIsSprint = false;
@@ -79,7 +89,7 @@ void ALMACharacter::StartSprint() {
 	} 
 }
 void ALMACharacter::StopSprint() {
-	GetCharacterMovement()->MaxWalkSpeed = NormalMaxWalkSpeed;
+	PlayerMovement->MaxWalkSpeed = NormalMaxWalkSpeed;
 	bIsSprint = false;
 }
 void ALMACharacter::UpdateStamina() {
@@ -89,5 +99,17 @@ void ALMACharacter::UpdateStamina() {
 		bHasStamina = false;
 		StopSprint();
 	} else if (CurrentStamina >= 50.f) { bHasStamina = true; }
-	GEngine->AddOnScreenDebugMessage(1, 0.5f, FColor::Silver, *(FString::Printf(TEXT("Stamina - Current: %f"), CurrentStamina)));
+}
+
+void ALMACharacter::OnHealthChanged(float NewHealth) {
+	GEngine->AddOnScreenDebugMessage(4, 0.5f, FColor::Green, *(FString::Printf(TEXT("i'm here"))));
+}
+
+void ALMACharacter::OnDeath() {
+	PlayerMovement->DisableMovement();
+	PlayAnimMontage(DeathMontage);
+	SetLifeSpan(5.f);
+	if (PC) {
+		PC->ChangeState(NAME_Spectating);
+	}
 }

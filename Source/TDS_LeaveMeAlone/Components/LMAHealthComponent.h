@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "LMAHealthComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnDeath);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float)
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TDS_LEAVEMEALONE_API ULMAHealthComponent : public UActorComponent {
@@ -16,7 +18,11 @@ public:
 
 	UFUNCTION(BlueprintCallable) float GetHealth() const { return Health; }
 
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UFUNCTION(BlueprintCallable) bool IsDead() const;
+
+	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	FOnDeath OnDeath;
+	FOnHealthChanged OnHealthChanged;
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player|Health") float MaxHealth = 100.f;
 
@@ -25,6 +31,12 @@ protected:
 
 private:
 	float Health = 0.f;
+
+	// For Delegates with damage
+	UFUNCTION() void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+	UPROPERTY()
+	TObjectPtr<AActor> OwnerComponent = nullptr;
 
 	GENERATED_BODY()
 };

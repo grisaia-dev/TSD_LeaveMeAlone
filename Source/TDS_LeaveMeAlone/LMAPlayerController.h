@@ -32,6 +32,8 @@ protected:
 	virtual void OnPossess(APawn* aPawn) override;
 	virtual void OnUnPossess() override;
 
+	virtual void BeginSpectatingState() override;
+
 	virtual void BeginPlay() override;
 
 private:

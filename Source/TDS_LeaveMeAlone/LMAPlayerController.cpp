@@ -27,7 +27,6 @@ void ALMAPlayerController::HandleMove(const FInputActionValue& InputActionValue)
 void ALMAPlayerController::HandleStartSprint() {
     // Value is a bool (Value not used here) Just pressed is true not pressed is false
 
-    //  todo@: Сделать спринт
     if (PlayerCharacter) {
         PlayerCharacter->StartSprint();
     }
@@ -77,3 +76,10 @@ void ALMAPlayerController::OnUnPossess() {
     Super::OnUnPossess();
 }
 
+void ALMAPlayerController::BeginSpectatingState() {
+    SetControlRotation(FRotator(-75.f, 0.f, 0.f));
+    bShowMouseCursor = false;
+    SetIgnoreLookInput(true);
+    SetIgnoreMoveInput(true);
+    Super::BeginSpectatingState();
+}

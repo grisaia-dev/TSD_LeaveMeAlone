@@ -17,15 +17,25 @@ ULMAHealthComponent::ULMAHealthComponent() {
 void ULMAHealthComponent::BeginPlay() {
 	Super::BeginPlay();
 
-	// ...
+	Health = MaxHealth;
+	OnHealthChanged.Broadcast(Health);
+
+	OwnerComponent = GetOwner();
+	checkf(OwnerComponent, TEXT("don't get owner"));
+	if (OwnerComponent) OwnerComponent->OnTakeAnyDamage.AddDynamic(this, &ULMAHealthComponent::OnTakeAnyDamage);
 	
 }
 
-
 // Called every frame
-void ULMAHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+//void ULMAHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
+	//Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+//}
 
-	// ...
+void ULMAHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser) {
+	if (IsDead()) { return; }
+	if (!IsDead()) { Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth); }
+	OnHealthChanged.Broadcast(Health);
+	if (IsDead()) { OnDeath.Broadcast(); }
 }
 
+bool ULMAHealthComponent::IsDead() const { return Health <= 0.f; }
