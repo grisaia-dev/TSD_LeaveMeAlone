@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/LMAWeaponComponent.h"
 
 // Sets default values
 ALMACharacter::ALMACharacter() {
@@ -32,6 +33,8 @@ ALMACharacter::ALMACharacter() {
 	bUseControllerRotationYaw = false;
 
 	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
+
+	WeaponComponent = CreateDefaultSubobject<ULMAWeaponComponent>("weapon");
 }
 
 // Called when the game starts or when spawned
@@ -65,9 +68,6 @@ void ALMACharacter::Tick(float DeltaTime) {
 	GEngine->AddOnScreenDebugMessage(2, 0.5f, FColor::Green, *(FString::Printf(TEXT("Health - Current: %f"), HealthComponent->GetHealth())));
 	GEngine->AddOnScreenDebugMessage(1, 0.5f, FColor::Silver, *(FString::Printf(TEXT("Stamina - Current: %f"), CurrentStamina)));
 }
-
-// Called to bind functionality to input
-//void ALMACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) { Super::SetupPlayerInputComponent(PlayerInputComponent); }
 
 void ALMACharacter::RotationOnCursor() {
 	if (PC) {

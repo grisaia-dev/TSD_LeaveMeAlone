@@ -9,6 +9,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class ULMAHealthComponent;
+class ULMAWeaponComponent;
 
 UCLASS()
 class TDS_LEAVEMEALONE_API ALMACharacter : public ACharacter {
@@ -28,8 +29,7 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	// Called to bind functionality to input
-	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components") TObjectPtr<USpringArmComponent> SpringArmComponent = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components") TObjectPtr<UCameraComponent> CameraComponent = nullptr;
@@ -42,9 +42,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Movement", meta = (ClampMin = "500", ClampMax = "600")) float SprintMaxWalkSpeed = 500.f;
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player|Weapon") ULMAWeaponComponent* WeaponComponent = nullptr;
 
+	virtual void BeginPlay() override; // Called when the game starts or when spawned
 private:
 	// Character mesh see on Cursor
 	void RotationOnCursor();
