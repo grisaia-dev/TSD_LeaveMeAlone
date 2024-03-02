@@ -39,3 +39,12 @@ void ULMAHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, co
 }
 
 bool ULMAHealthComponent::IsDead() const { return Health <= 0.f; }
+
+bool ULMAHealthComponent::IsHealthFull() const { return FMath::IsNearlyEqual(Health, MaxHealth); }
+
+bool ULMAHealthComponent::AddHealth(float NewHealth) {
+	if (IsDead() || IsHealthFull()) return false;
+	Health = FMath::Clamp(Health + NewHealth, 0.f, MaxHealth);
+	OnHealthChanged.Broadcast(Health);
+	return true;
+}

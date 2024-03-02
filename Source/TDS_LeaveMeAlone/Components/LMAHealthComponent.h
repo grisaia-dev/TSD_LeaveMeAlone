@@ -20,6 +20,8 @@ public:
 
 	UFUNCTION(BlueprintCallable) bool IsDead() const;
 
+	bool AddHealth(float NewHealth);
+
 	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	FOnDeath OnDeath;
 	FOnHealthChanged OnHealthChanged;
@@ -35,8 +37,9 @@ private:
 	// For Delegates with damage
 	UFUNCTION() void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
-	UPROPERTY()
-	TObjectPtr<AActor> OwnerComponent = nullptr;
+	UPROPERTY() TObjectPtr<AActor> OwnerComponent = nullptr;
+
+	bool IsHealthFull() const;
 
 	GENERATED_BODY()
 };

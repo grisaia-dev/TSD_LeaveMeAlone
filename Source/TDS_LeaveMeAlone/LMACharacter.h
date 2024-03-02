@@ -24,6 +24,8 @@ public:
 	void StopSprint();
 #pragma endregion
 
+	UFUNCTION() ULMAHealthComponent* GetHealthComponent() const { return HealthComponent; }
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	// Called to bind functionality to input
