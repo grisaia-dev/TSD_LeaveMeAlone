@@ -5,12 +5,13 @@
 #include "LMACharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/LMAWeaponComponent.h"
 
 
 void ALMAPlayerController::BeginPlay() {
     Super::BeginPlay();
     SetInputMode(FInputModeGameOnly());
-    bShowMouseCursor = true;
+    bShowMouseCursor =true;
 }
 
 void ALMAPlayerController::HandleMove(const FInputActionValue& InputActionValue) {
@@ -26,15 +27,22 @@ void ALMAPlayerController::HandleMove(const FInputActionValue& InputActionValue)
 
 void ALMAPlayerController::HandleStartSprint() {
     // Value is a bool (Value not used here) Just pressed is true not pressed is false
+    if (PlayerCharacter) { PlayerCharacter->StartSprint(); }
+}
+void ALMAPlayerController::HandleStopSprint() {
+    if (PlayerCharacter) { PlayerCharacter->StopSprint(); }
+}
 
-    if (PlayerCharacter) {
-        PlayerCharacter->StartSprint();
+void ALMAPlayerController::HandleStartFire() {
+    if (PlayerCharacter && WeaponComponent) {
+        if (!PlayerCharacter->GetIsSprint())
+            WeaponComponent->StartFire();
     }
 }
 
-void ALMAPlayerController::HandleStopSprint() {
-    if (PlayerCharacter) {
-        PlayerCharacter->StopSprint();
+void ALMAPlayerController::HandleStopFire() {
+    if (PlayerCharacter && WeaponComponent) {
+        WeaponComponent->StopFire();
     }
 }
 
@@ -45,9 +53,13 @@ void ALMAPlayerController::OnPossess(APawn* aPawn) {
     PlayerCharacter = Cast<ALMACharacter>(aPawn);
     checkf(PlayerCharacter, TEXT("ALMAPlayerController derived classes should only possess ALMACharacter derived pawns"));
 
+    WeaponComponent = PlayerCharacter->GetWeaponComponent();
+    checkf(WeaponComponent, TEXT("Unable to get reference to the weapon component"));
+
     // Get a reference to the EnhancedInputComponent
     EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
     checkf(EnhancedInputComponent, TEXT("Unable to get reference to the EnhancedInputComponent"));
+
 
     // Get the local player subsystem
     UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
@@ -66,7 +78,10 @@ void ALMAPlayerController::OnPossess(APawn* aPawn) {
         EnhancedInputComponent->BindAction(ActionSprint, ETriggerEvent::Triggered, this, &ALMAPlayerController::HandleStartSprint);
         EnhancedInputComponent->BindAction(ActionSprint, ETriggerEvent::Completed, this, &ALMAPlayerController::HandleStopSprint);
     }
-
+    if (ActionFire) {
+        EnhancedInputComponent->BindAction(ActionFire, ETriggerEvent::Triggered, this, &ALMAPlayerController::HandleStartFire);
+        EnhancedInputComponent->BindAction(ActionFire, ETriggerEvent::Completed, this, &ALMAPlayerController::HandleStopFire);
+    }
 
 }
 

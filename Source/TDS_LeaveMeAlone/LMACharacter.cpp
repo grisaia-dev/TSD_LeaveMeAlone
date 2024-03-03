@@ -102,7 +102,7 @@ void ALMACharacter::UpdateStamina() {
 }
 
 void ALMACharacter::OnHealthChanged(float NewHealth) {
-	//GEngine->AddOnScreenDebugMessage(4, 0.5f, FColor::Green, *(FString::Printf(TEXT("i'm here"))));
+	GEngine->AddOnScreenDebugMessage(4, 0.5f, FColor::Green, *(FString::Printf(TEXT("Health add!"))));
 }
 
 void ALMACharacter::OnDeath() {

@@ -15,11 +15,19 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override; // Called every frame
 
 	void SpawnWeapon();
+
+#pragma region Fire
+	void StartFire();
+	void StopFire();
+#pragma endregion
+
+	
 protected:
 	virtual void BeginPlay() override; // Called when the game starts
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon") TSubclassOf<ALMABaseWeapon> WeaponClass;
 	UPROPERTY() ALMABaseWeapon* Weapon = nullptr;
+
 	GENERATED_BODY()
 };

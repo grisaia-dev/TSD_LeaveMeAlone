@@ -18,14 +18,16 @@ public:
 	ALMACharacter();
 
 #pragma region Stamina
-
 	// for enhanced input to start sprint
 	void StartSprint();
 	// for enhanced input to end sprint
 	void StopSprint();
+	bool GetIsSprint() const { return bIsSprint; }
 #pragma endregion
 
 	UFUNCTION() ULMAHealthComponent* GetHealthComponent() const { return HealthComponent; }
+
+	UFUNCTION() ULMAWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -46,11 +48,9 @@ protected:
 
 	virtual void BeginPlay() override; // Called when the game starts or when spawned
 private:
-	// Character mesh see on Cursor
-	void RotationOnCursor();
+	void RotationOnCursor(); // Character mesh see on Cursor
 
-	// Update stamina variables
-	void UpdateStamina();
+	void UpdateStamina(); // Update stamina variables
 
 	// Stamina
 	static constexpr float MaxStamina = 100.f;
@@ -68,10 +68,8 @@ private:
 	void OnDeath();
 	void OnHealthChanged(float NewHealth);
 
-	// To get reference to the PlayerController
-	UPROPERTY() TObjectPtr<APlayerController> PC = nullptr;
-	// To get reference to the Character Movement
-	UPROPERTY() TObjectPtr<UCharacterMovementComponent> PlayerMovement = nullptr;
+	UPROPERTY() TObjectPtr<APlayerController> PC = nullptr; // To get reference to the PlayerController
+	UPROPERTY() TObjectPtr<UCharacterMovementComponent> PlayerMovement = nullptr; // To get reference to the Character Movement
 
 	GENERATED_BODY()
 

@@ -11,6 +11,7 @@
 class UEnhancedInputComponent;
 class ALMACharacter;
 class UInputMappingContext;
+class ULMAWeaponComponent;
 
 UCLASS(Abstract)
 class TDS_LEAVEMEALONE_API ALMAPlayerController : public APlayerController {
@@ -22,12 +23,18 @@ public:
 	// The Input Action to map to movement sprint
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Input|Character Movement") TObjectPtr<UInputAction> ActionSprint = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Input|Character Action") TObjectPtr<UInputAction> ActionFire = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Input|Character Movement") TObjectPtr<UInputMappingContext> InputMappingContent = nullptr;
+
+	UFUNCTION() ALMACharacter* GetPlayerCharacter() const { return PlayerCharacter; }
 
 protected:
 	void HandleMove(const FInputActionValue& InputActionValue);
 	void HandleStartSprint();
 	void HandleStopSprint();
+	void HandleStartFire();
+	void HandleStopFire();
 
 	virtual void OnPossess(APawn* aPawn) override;
 	virtual void OnUnPossess() override;
@@ -42,6 +49,8 @@ private:
 
 	// Used to store a reference to the Pawn we are controlling
 	UPROPERTY() TObjectPtr<ALMACharacter> PlayerCharacter = nullptr;
+
+	UPROPERTY() TObjectPtr<ULMAWeaponComponent> WeaponComponent = nullptr;
 
 	GENERATED_BODY()
 };

@@ -4,6 +4,8 @@
 #include "LMAWeaponComponent.h"
 #include "../Weapon/LMABaseWeapon.h"
 #include "GameFramework/Character.h"
+#include "Engine/TimerHandle.h"
+#include "../LMACharacter.h"
 
 // Sets default values for this component's properties
 ULMAWeaponComponent::ULMAWeaponComponent() {
@@ -12,13 +14,12 @@ ULMAWeaponComponent::ULMAWeaponComponent() {
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
 // Called when the game starts
 void ULMAWeaponComponent::BeginPlay() {
 	Super::BeginPlay();
 	SpawnWeapon();
-}
 
+}
 
 // Called every frame
 void ULMAWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
@@ -34,4 +35,13 @@ void ULMAWeaponComponent::SpawnWeapon() {
 			Weapon->AttachToComponent(Character->GetMesh(), AttachmentRules, "r_weapon_socket");
 		}
 	}
+}
+
+void ULMAWeaponComponent::StartFire() {
+	Weapon->StartFire();
+	GEngine->AddOnScreenDebugMessage(4, 1.f, FColor::Emerald, *(FString::Printf(TEXT("FIRE!"))));
+}
+
+void ULMAWeaponComponent::StopFire() {
+	Weapon->StopFire();
 }
