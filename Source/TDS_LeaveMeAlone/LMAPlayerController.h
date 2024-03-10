@@ -25,6 +25,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Input|Character Action") TObjectPtr<UInputAction> ActionFire = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Input|Character Action") TObjectPtr<UInputAction> ActionReload = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Input|Character Movement") TObjectPtr<UInputMappingContext> InputMappingContent = nullptr;
 
 	UFUNCTION() ALMACharacter* GetPlayerCharacter() const { return PlayerCharacter; }
@@ -35,6 +37,7 @@ protected:
 	void HandleStopSprint();
 	void HandleStartFire();
 	void HandleStopFire();
+	void HandleReload();
 
 	virtual void OnPossess(APawn* aPawn) override;
 	virtual void OnUnPossess() override;

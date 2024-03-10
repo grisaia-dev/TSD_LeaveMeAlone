@@ -21,13 +21,24 @@ public:
 	void StopFire();
 #pragma endregion
 
-	
+	void Reload();
+	bool CanReload() const;
+
 protected:
 	virtual void BeginPlay() override; // Called when the game starts
+
+	void InitAnimNotify();
+	void OnNotifyReloadFinished(USkeletalMeshComponent* SkeletalMesh);
+
+	void OnClipIsEmpty(bool Ammo);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon") TSubclassOf<ALMABaseWeapon> WeaponClass;
 	UPROPERTY() ALMABaseWeapon* Weapon = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	UAnimMontage* ReloadMontage = nullptr;
+	bool AnimReloading = false;
 
 	GENERATED_BODY()
 };

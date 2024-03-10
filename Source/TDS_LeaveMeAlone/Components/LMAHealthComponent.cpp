@@ -1,6 +1,4 @@
 // Make by Jatex. All Right Reserved.
-
-
 #include "LMAHealthComponent.h"
 
 // Sets default values for this component's properties

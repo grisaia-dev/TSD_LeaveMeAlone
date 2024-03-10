@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Engine/TimerHandle.h"
 #include "../LMACharacter.h"
+#include "../Animations/LMAReloadFinishedAnimNotify.h"
 
 // Sets default values for this component's properties
 ULMAWeaponComponent::ULMAWeaponComponent() {
@@ -18,7 +19,7 @@ ULMAWeaponComponent::ULMAWeaponComponent() {
 void ULMAWeaponComponent::BeginPlay() {
 	Super::BeginPlay();
 	SpawnWeapon();
-
+	InitAnimNotify();
 }
 
 // Called every frame
@@ -33,15 +34,55 @@ void ULMAWeaponComponent::SpawnWeapon() {
 		if (Character) {
 			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
 			Weapon->AttachToComponent(Character->GetMesh(), AttachmentRules, "r_weapon_socket");
+			Weapon->OnClipIsEmpty.AddUObject(this, &ULMAWeaponComponent::OnClipIsEmpty);
 		}
 	}
 }
 
 void ULMAWeaponComponent::StartFire() {
-	Weapon->StartFire();
-	GEngine->AddOnScreenDebugMessage(4, 1.f, FColor::Emerald, *(FString::Printf(TEXT("FIRE!"))));
+	if (Weapon && !AnimReloading)
+		Weapon->StartFire();
 }
 
 void ULMAWeaponComponent::StopFire() {
 	Weapon->StopFire();
+}
+
+void ULMAWeaponComponent::InitAnimNotify() {
+	if (!ReloadMontage) return;
+	const auto NotifiesEvents = ReloadMontage->Notifies;
+	for (auto NotifyEvent : NotifiesEvents) {
+		auto ReloadFinish = Cast<ULMAReloadFinishedAnimNotify>(NotifyEvent.Notify);
+		if (ReloadFinish) {
+			ReloadFinish->OnNotifyReloadFinished.AddUObject(this, &ULMAWeaponComponent::OnNotifyReloadFinished);
+			break;
+		}
+	}
+}
+
+void ULMAWeaponComponent::OnNotifyReloadFinished(USkeletalMeshComponent* SkeletalMesh) {
+	const auto Character = Cast<ACharacter>(GetOwner());
+	if (Character->GetMesh() == SkeletalMesh) { 
+		AnimReloading = false;
+		Weapon->ChangeClip();
+	}
+}
+
+bool ULMAWeaponComponent::CanReload() const {
+	return !AnimReloading && !Weapon->IsCurrentClipFull();
+}
+
+void ULMAWeaponComponent::OnClipIsEmpty(bool Ammo) {
+	if (Ammo) {
+		Reload();
+		GEngine->AddOnScreenDebugMessage(3, 2.0f, FColor::Silver, FString::Printf(TEXT("Reload?: %i"), Ammo));
+	}
+}
+
+void ULMAWeaponComponent::Reload() {
+	if (!CanReload()) return;
+	StopFire();
+	AnimReloading = true;
+	ACharacter* Character = Cast<ACharacter>(GetOwner());
+	Character->PlayAnimMontage(ReloadMontage);
 }

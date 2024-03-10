@@ -1,5 +1,4 @@
 // Make by Jatex. All Right Reserved.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -24,6 +23,8 @@ public:
 	void StopSprint();
 	bool GetIsSprint() const { return bIsSprint; }
 #pragma endregion
+
+	bool IsDead() const;
 
 	UFUNCTION() ULMAHealthComponent* GetHealthComponent() const { return HealthComponent; }
 

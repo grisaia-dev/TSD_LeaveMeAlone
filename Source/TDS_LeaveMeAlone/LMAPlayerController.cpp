@@ -11,7 +11,7 @@
 void ALMAPlayerController::BeginPlay() {
     Super::BeginPlay();
     SetInputMode(FInputModeGameOnly());
-    bShowMouseCursor =true;
+    bShowMouseCursor = true;
 }
 
 void ALMAPlayerController::HandleMove(const FInputActionValue& InputActionValue) {
@@ -35,7 +35,7 @@ void ALMAPlayerController::HandleStopSprint() {
 
 void ALMAPlayerController::HandleStartFire() {
     if (PlayerCharacter && WeaponComponent) {
-        if (!PlayerCharacter->GetIsSprint())
+        if (!PlayerCharacter->GetIsSprint() || !WeaponComponent->CanReload())
             WeaponComponent->StartFire();
     }
 }
@@ -43,6 +43,12 @@ void ALMAPlayerController::HandleStartFire() {
 void ALMAPlayerController::HandleStopFire() {
     if (PlayerCharacter && WeaponComponent) {
         WeaponComponent->StopFire();
+    }
+}
+
+void ALMAPlayerController::HandleReload() {
+    if (PlayerCharacter && WeaponComponent) {
+        WeaponComponent->Reload();
     }
 }
 
@@ -82,6 +88,8 @@ void ALMAPlayerController::OnPossess(APawn* aPawn) {
         EnhancedInputComponent->BindAction(ActionFire, ETriggerEvent::Triggered, this, &ALMAPlayerController::HandleStartFire);
         EnhancedInputComponent->BindAction(ActionFire, ETriggerEvent::Completed, this, &ALMAPlayerController::HandleStopFire);
     }
+    if (ActionReload)
+        EnhancedInputComponent->BindAction(ActionReload, ETriggerEvent::Triggered, this, &ALMAPlayerController::HandleReload);
 
 }
 

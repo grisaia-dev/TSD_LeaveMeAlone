@@ -1,9 +1,9 @@
 // Make by Jatex. All Right Reserved.
-
-
 #include "LMABaseWeapon.h"
 #include "../LMACharacter.h"
 #include "Kismet/GameplayStatics.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogWeapon, All, All);
 
 // Sets default values
 ALMABaseWeapon::ALMABaseWeapon() {
@@ -21,12 +21,14 @@ void ALMABaseWeapon::BeginPlay() {
 
 	PlayerCharacter = Cast<ALMACharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	checkf(PlayerCharacter, TEXT("Get reference to the PlayerCharacter"));
+
+	CurrentAmmoWeapon.Bullets = AmmoWeapon.Bullets;
 }
 
 // Called every frame
 void ALMABaseWeapon::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
-
+	GEngine->AddOnScreenDebugMessage(5, 1.f, FColor::White, *(FString::Printf(TEXT("Ammo: %i"), CurrentAmmoWeapon.Bullets)));
 }
 
 void ALMABaseWeapon::StartFire() {
@@ -38,7 +40,7 @@ void ALMABaseWeapon::StopFire() {
 }
 
 void ALMABaseWeapon::Shoot() {
-	if (PlayerCharacter->GetIsSprint()) { StopFire(); return; }
+	if (PlayerCharacter->GetIsSprint() || PlayerCharacter->IsDead()) { StopFire(); return; }
 	const FTransform SocketTransform = WeaponComponent->GetSocketTransform("Fire");
 	const FVector TraceStart = SocketTransform.GetLocation();
 	const FVector ShootDirection = SocketTransform.GetRotation().GetForwardVector();
@@ -51,4 +53,15 @@ void ALMABaseWeapon::Shoot() {
 	if (HitResult.bBlockingHit) {
 		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 5.f, 24, FColor::Red, false, 1.0f);
 	}
+	DecrementBulltes();
+}
+
+void ALMABaseWeapon::ChangeClip() { CurrentAmmoWeapon.Bullets = AmmoWeapon.Bullets; }
+
+bool ALMABaseWeapon::IsCurrentClipEmpty() const { return CurrentAmmoWeapon.Bullets == 0; }
+bool ALMABaseWeapon::IsCurrentClipFull() const { return CurrentAmmoWeapon.Bullets == 30; }
+
+void ALMABaseWeapon::DecrementBulltes() {
+	CurrentAmmoWeapon.Bullets = FMath::Clamp(CurrentAmmoWeapon.Bullets - 1, 0, 30);
+	OnClipIsEmpty.Broadcast(IsCurrentClipEmpty());
 }
