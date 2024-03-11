@@ -65,7 +65,6 @@ void ALMACharacter::Tick(float DeltaTime) {
 	}
 
 	// temporary displey debug info
-	GEngine->AddOnScreenDebugMessage(2, 0.5f, FColor::Green, *(FString::Printf(TEXT("Health - Current: %f"), HealthComponent->GetHealth())));
 	GEngine->AddOnScreenDebugMessage(1, 0.5f, FColor::Silver, *(FString::Printf(TEXT("Stamina - Current: %f"), CurrentStamina)));
 }
 
